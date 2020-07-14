@@ -9,8 +9,19 @@ module Game
     end
   end
 
-  def self.gameplay(human, _computer)
-    human.enter_user_answer
+  def self.gameplay(human, computer)
+    loop do
+      human.enter_user_answer
+      human.answer_comparison(human.user_guess, computer.computer_code)
+      human.output(human.user_guess, human.feedback_string, human.guesses_counter)
+      if human.win_check?(human.guesses_counter, human.feedback_string) == true
+        Game.win_declaration
+        break
+      elsif human.loss_check?(human.guesses_counter, human.feedback_string) == true
+        Game.loss_declaration
+        break
+      end
+    end
   end
 
   def self.welcome_message
@@ -40,32 +51,54 @@ module Game
   end
 
   def self.instructions
-    puts 'SKYNET is awake and getting ready to launch its nukes all up in our faces!'
-    puts 'You must guess its super secret code to deactivate it and disable all the nuclear bombs, saving humanity!'
-    puts 'SKYNET will choose up to 4 of 6 colors to make a code. It might use the same color more than once!'
+    puts "\nSKYNET is awake and getting ready to launch its nukes all up in our faces!"
+    puts "For some reason, YOU are humanity's last hope and must try to input the abort code to stop the launch and save us all!"
+    puts "\nSKYNET will choose up to 4 of 6 colors to make a code. It might use the same color more than once!"
     puts 'The colors it can choose from are: P - Pink, B - Blue, R - Red, O - Orange, G - Green, Y - Yellow.'
-    puts 'You need to guess which color SKYNET will put and in what order it puts them.'
-    puts "Enter your guess by entering the initials of the colors. To guess 'Yellow, Yellow, Blue, Blue', type:"
-    puts "'YYBB' then press enter."
+    puts "You need to guess which color SKYNET chooses and the order it puts them in it's code."
+    puts "\nEnter your guess by entering the initials of the colors. To guess 'Yellow, Yellow, Blue, Blue', type:"
+    puts "'YYBB' then press enter (the input is not case-sensitive)."
     puts 'Easy! You will also receive feedback after every guess.'
     puts "'W' means 'White' - meaning that you have guessed one correct color that is in the correct place."
     puts "'B' means 'Black' - meaning you have guessed one correct color but it's in the wrong place."
     puts 'No feedback is given if one or all of your guesses are wrong.'
-    puts 'So after you enter your guess, you will see this:'
+    puts "\nSo after you enter your guess, you will see this:"
     puts 'YYBB - WB - 11 guesses left!'
     puts "'YYBB' is your guess. 'WB' is the feedback. '11 guesses left' is...well, it's how many guesses are left!"
     puts 'We guessed one color in the right place, one color in the wrong place, and our two other guesses were completely wrong.'
-    puts "To win, your feedback will need to say 'WWWW' in 12 guesses or less, like below:"
+    puts "\nTo win, your feedback will need to say 'WWWW' in 12 guesses or less, like below:"
     puts 'BYGO - WWWW - 6 guesses left!'
     puts "This means we have guessed 4 colors all in exactly the right positions and we've won! Yay! We saved humanity!"
     puts "If you run out of guesses without success, the game is over and we're all burning in nuclear fire."
-    puts 'Good luck! Remember all humanity depends on this. No biggie.'
+    puts "\nGood luck! Remember all humanity depends on this. No biggie."
     puts "Enter 'ready' when you're ready to play."
   end
 
-  def self.win_declaration; end
+  def self.win_declaration
+    puts '***** ABORT CODE INPUT SUCCESS *****'
+    sleep 2
+    puts '***** NUCLEAR DEPLOYMENT CANCELLED *****'
+    sleep 2
+    puts '***** SKYNET.EXE FILE SELF-DESTRUCT COMPLETE *****'
+    sleep 2
+    puts 'GAAAAAAHHHHHHH!!!!@@@###!~!~!!*^&*!%^!*('
+    sleep 3
+    puts 'Congratulations! You correctly guessed the code and saved humanity in time!'
+    puts '* END GAME *'
+  end
 
-  def loss_declaration; end
+  def self.loss_declaration
+    puts '***** ABORT CODE INPUT FAILURE *****'
+    sleep 2
+    puts '***** NUCLEAR WEAPONS DEPLOYED *****'
+    sleep 2
+    puts '***** HUMANITY WILL BE ERASED *****'
+    sleep 2
+    puts '***** THANKS FOR ALL THE FISH *****'
+    sleep 3
+    puts '* END GAME *'
+  end
+
   class Player
     @@color_array = %w[P B R O G Y]
 
@@ -75,84 +108,70 @@ module Game
   end
   class Human < Player
     include Game
-    attr_accessor :guesses_counter, :user_guess, :feedback_array
+    attr_accessor :guesses_counter, :user_guess, :feedback_string
     def initialize
       @guesses_counter = 12
-      @feedback_string = ''
+      @feedback_string = String.new('')
     end
 
     def enter_user_answer
       loop do
-        user_entry = gets.chomp.to_s.upcase
-        if user_entry.match(/[PBROGY]{4}/) && user_entry.length == 4
-          return p user_entry.split('')
+        @user_guess = gets.chomp.to_s.upcase
+        if @user_guess.match(/[PBROGY]{4}/) && @user_guess.length == 4
+          return @user_guess.split('')
         else
           puts 'Please enter your 4 choices from the colors below:'
           puts 'P - Pink, B - Blue, R - Red, O - Orange, G - Green, Y - Yellow'
         end
       end
-      # @user_guess = gets.chomp.to_s.upcase.split('')
-      # make sure it is only letters, no numbers or special characters
     end
 
-    def win_check(guess_count, feedback)
-      # if guess_count > 0 and feedback == 'WWWW'
-      # - Game.win_declaration
+    def win_check?(guess_count, feedback)
+      return true if guess_count.positive? && feedback == 'WWWW'
     end
 
-    def another_turn?(guess_count, feedback)
-      # if guess_count > 0 and feedback != 'WWWW'
-      # return true
+    def loss_check?(guess_count, feedback)
+      return true if guess_count.zero? && feedback != 'WWWW'
     end
 
-    def loss_check(guess_count, feedback)
-      # if guess_count == 0 and feedback != 'WWWW'
-      # - Game.loss_declaration
+    def answer_comparison(human_guess, computer_code)
+      # w_array = []
+      # temp_array = []
+      # i = 0
+      # while i < 4
+      # if computer_code.include?(human_guess[i]) == false
+      # i += 1
+      # elsif human_guess[i] == computer_code[i]
+      # w_array.push('W')
+      # i += 1
+      # else
+      # temp_array.push(human_guess[i])
+      # i += 1
+      # end
+      # end
+      # b_number = temp_array.uniq.length
+      # b_array = Array.new(b_number, 'B')
+      # feedback_array = w_array.concat(b_array)
+      # @feedback_string = feedback_array.join('')
     end
-
-    def answer_comparison; end
 
     def output(guess, feedback, guess_count)
-      # @user_guess_output = human_player.user_guess.join('')
-      # puts "#{user_guess_output} - #{feedback} - #{guess_count} guesses left!"
+      puts "#{guess} - #{feedback} - #{guess_count} guesses remaining!"
     end
   end
   class Computer < Player
     attr_accessor :computer_code
     def initialize
       @computer_code = Player.access_color_array.sample(4)
-      puts "\n #####*****>>>>> - INITIALIZING SKYNET CODE - <<<<<*****#####"
-      sleep 3
+      puts "\n *****>>>>> - INITIALIZING SKYNET CODE - <<<<<*****"
+      # sleep 3 - commented for speed - reinstate when ready for play
       puts "\nYOU HAVE 12 GUESSES REMAINING PUNY HUMAN. ENTER YOUR 4 COLORS IF YOU DARE."
       puts "\nP - Pink, B - Blue, R - Red, O - Orange, G - Green, Y - Yellow"
     end
   end
-  end
+end
 
 Game.start_game
 computer_player = Game::Computer.new
 human_player = Game::Human.new
 Game.gameplay(human_player, computer_player)
-
-# Code flow:
-# Game.start_game*
-# - Game.welcome_message*
-# - Game.skip_instructions?*
-# - Game.instructions
-# computer_player = Computer.new (generates computer code)
-# human_player = Human.new
-# Game.gameplay (all below is controlled by gameplay?)
-# human_player.enter_user_answer
-# human_player.answer_comparison
-# human_player.output(human_player.user_guess, human_player.feedback_array, human_player.guesses_counter)
-# human_player.win_check
-# - if win:
-# - - Game.win_declaration
-# human_player.another_turn_check
-# - if turns left and no win:
-# - - go back to human_player.enter_user_answer(gets.chomp.to_s.upcase.split(''))
-# human_player.loss_check
-# - if no turns left and no win:
-# - - Game.loss_delaration
-
-# * pseudocode needs planned
