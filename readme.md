@@ -41,6 +41,7 @@ COMPLETED:
 
 TODO:
 - Create answer comparison method (and sub-methods when necessary)
+- Save as a 'version' (refer to git instructions book) when this is complete.
 
 So the game is pretty much complete, except for the fact that the most crucial part is not working and I haven't figured it out yet. Which I will.
 The UI is all complete, the game loop is tested, the win/loss checks and logic work.
