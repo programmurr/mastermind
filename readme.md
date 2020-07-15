@@ -48,4 +48,11 @@ The UI is all complete, the game loop is tested, the win/loss checks and logic w
 
 After banging my head against the answer comparison logic for a few hours, I chucked everything and can see promise in using hashes. I tried arrays and regexp, doesn't seem like they can handle it. So I've got it pseudocoded in a test code file for now and can see promise in it. See if I can find some way of whittling down the detections to produce the appropriate Ws and Bs. Check the exercises folder to see if there are any useful hash methods or solutions in there.
 
+___
+15th July 2020
+
+Still haven't been able to solve it today. After about 6 hours. I WILL SOLVE IT, just need to clear my head after today. Maybe get back to writing it down. Just get off the computer for now.
+Deep in the hash rabbit hole lol. I've made progress, but keep getting stuck on the same point 'only push 1 B if the color is detected more than once but the indexes don't match'
+Maybe try a whole new approach next time. Even the hashes might not be enough.
+
 
