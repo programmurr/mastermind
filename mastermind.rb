@@ -11,7 +11,6 @@ module Game
 
   def self.gameplay(human, computer)
     loop do
-      # clear feedback string
       human.enter_user_answer
       human.answer_comparison(human.user_guess, computer.computer_code)
       human.output(human.user_guess, human.feedback_string, human.guesses_counter)
@@ -67,7 +66,7 @@ module Game
     puts 'YBOG - HC - 11 guesses left!'
     puts "'YBOG' is your guess. 'HC' is the feedback. '11 guesses left' is...well, it's how many guesses are left!"
     puts 'We guessed one color in the right place, one color in the wrong place, and our two other guesses were completely wrong.'
-    puts "\nTo win, your feedback will need to say 'HHHH' in 12 guesses or less, like below:"
+    puts "\nTo win, your feedback will need to say 'HHHH' before you run out of guesses, like below:"
     puts 'GROP - HHHH - 6 guesses left!'
     puts "This means we have guessed 4 colors all in exactly the right positions and we've won! Yay! We saved humanity!"
     puts "If you run out of guesses without success, the game is over and we're all burning in nuclear hell-fire."
@@ -130,7 +129,7 @@ module Game
     end
 
     def win_check?(guess_count, feedback)
-      return true if guess_count.positive? && feedback == 'HHHH'
+      return true if guess_count >= 0 && feedback == 'HHHH'
     end
 
     def loss_check?(guess_count, feedback)
@@ -152,20 +151,36 @@ module Game
     def output(guess, feedback, guess_count)
       puts "#{guess} - #{feedback} - #{guess_count} guesses remaining!"
     end
+
+    def choose_difficulty
+      puts "\nPlease choose your difficulty level:"
+      puts "\nEnter E for Easy - You have 12 guesses"
+      puts 'Enter M for Medium - You have 9 guesses'
+      puts 'Enter H for Hard - You have 6 guesses'
+      loop do
+        difficulty = gets.chomp.to_s.downcase
+        return @guesses_counter = 12 if difficulty == 'e'
+        return @guesses_counter = 9 if difficulty == 'm'
+        return @guesses_counter = 6 if difficulty == 'h'
+
+        puts 'Please enter the right letter to choose your difficulty level (it is not case-sensitive).'
+      end
+    end
   end
   class Computer < Player
     attr_accessor :computer_code
-    def initialize
+    def initialize(guesses)
       @computer_code = Player.access_color_array.sample(4)
       puts "\n *****>>>>> - INITIALIZING SKYNET CODE - <<<<<*****"
       sleep 3
-      puts "\nYOU HAVE 12 GUESSES REMAINING PUNY HUMAN. ENTER YOUR 4 COLORS IF YOU DARE."
+      puts "\nYOU HAVE #{guesses} GUESSES REMAINING PUNY HUMAN. ENTER YOUR 4 COLORS IF YOU DARE."
       puts "\nP - Pink, B - Blue, R - Red, O - Orange, G - Green, Y - Yellow"
     end
   end
 end
 
 Game.start_game
-computer_player = Game::Computer.new
 human_player = Game::Human.new
+human_player.choose_difficulty
+computer_player = Game::Computer.new(human_player.guesses_counter)
 Game.gameplay(human_player, computer_player)

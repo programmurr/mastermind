@@ -69,4 +69,9 @@ I'm just glad that I didn't give in and look at any solutions this time, just ke
 
 On to version 2... building the AI.
 
+___
+16th July additional - 
+
+Found a bug lol. If the user had HHHH at 0 guesses remaining, the game continued into negative guesses remaining. Caught it! Also, now the user can choose their difficulty. V 1.1 complete. Moving on to the AI now. 
+
 
