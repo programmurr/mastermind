@@ -55,4 +55,18 @@ Still haven't been able to solve it today. After about 6 hours. I WILL SOLVE IT,
 Deep in the hash rabbit hole lol. I've made progress, but keep getting stuck on the same point 'only push 1 B if the color is detected more than once but the indexes don't match'
 Maybe try a whole new approach next time. Even the hashes might not be enough.
 
+___
+16th July 2020
+
+Version one is complete! W00t!
+
+I can't take credit though. I reached out to the kind people at the odin project discord and they helped a LOT!
+
+The lesson learned is:
+- If it looks needlessly complicated, it probably is
+
+I'm just glad that I didn't give in and look at any solutions this time, just kept trying different ways, and wasn't *totally* afraid to delete code and start over. However, I talked myself into a hash method and didn't talk myself out of it, when a simple array comparison was indeed all that was needed. I was initially right! Just didn't know how to do what I wanted. But now, I do!
+
+On to version 2... building the AI.
+
 

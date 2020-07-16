@@ -11,6 +11,7 @@ module Game
 
   def self.gameplay(human, computer)
     loop do
+      # clear feedback string
       human.enter_user_answer
       human.answer_comparison(human.user_guess, computer.computer_code)
       human.output(human.user_guess, human.feedback_string, human.guesses_counter)
@@ -18,7 +19,7 @@ module Game
         Game.win_declaration
         break
       elsif human.loss_check?(human.guesses_counter, human.feedback_string) == true
-        Game.loss_declaration
+        Game.loss_declaration(computer.computer_code.join(''))
         break
       end
     end
@@ -56,20 +57,20 @@ module Game
     puts "\nSKYNET will choose up to 4 of 6 colors to make a code. It might use the same color more than once!"
     puts 'The colors it can choose from are: P - Pink, B - Blue, R - Red, O - Orange, G - Green, Y - Yellow.'
     puts "You need to guess which color SKYNET chooses and the order it puts them in it's code."
-    puts "\nEnter your guess by entering the initials of the colors. To guess 'Yellow, Yellow, Blue, Blue', type:"
-    puts "'YYBB' then press enter (the input is not case-sensitive)."
+    puts "\nEnter your guess by entering the initials of the colors. To guess 'Yellow, Blue, Orange, Green', type:"
+    puts "'YBOG' then press enter (the input is not case-sensitive)."
     puts 'Easy! You will also receive feedback after every guess.'
-    puts "'W' means 'White' - meaning that you have guessed one correct color that is in the correct place."
-    puts "'B' means 'Black' - meaning you have guessed one correct color but it's in the wrong place."
+    puts "'H' means 'HIT!' - meaning that you have guessed one correct color that is in the correct place."
+    puts "'C' means 'CLOSE!' - meaning you have guessed one correct color but it's in the wrong place."
     puts 'No feedback is given if one or all of your guesses are wrong.'
     puts "\nSo after you enter your guess, you will see this:"
-    puts 'YYBB - WB - 11 guesses left!'
-    puts "'YYBB' is your guess. 'WB' is the feedback. '11 guesses left' is...well, it's how many guesses are left!"
+    puts 'YBOG - HC - 11 guesses left!'
+    puts "'YBOG' is your guess. 'HC' is the feedback. '11 guesses left' is...well, it's how many guesses are left!"
     puts 'We guessed one color in the right place, one color in the wrong place, and our two other guesses were completely wrong.'
-    puts "\nTo win, your feedback will need to say 'WWWW' in 12 guesses or less, like below:"
-    puts 'BYGO - WWWW - 6 guesses left!'
+    puts "\nTo win, your feedback will need to say 'HHHH' in 12 guesses or less, like below:"
+    puts 'GROP - HHHH - 6 guesses left!'
     puts "This means we have guessed 4 colors all in exactly the right positions and we've won! Yay! We saved humanity!"
-    puts "If you run out of guesses without success, the game is over and we're all burning in nuclear fire."
+    puts "If you run out of guesses without success, the game is over and we're all burning in nuclear hell-fire."
     puts "\nGood luck! Remember all humanity depends on this. No biggie."
     puts "Enter 'ready' when you're ready to play."
   end
@@ -87,8 +88,10 @@ module Game
     puts '* END GAME *'
   end
 
-  def self.loss_declaration
+  def self.loss_declaration(code)
     puts '***** ABORT CODE INPUT FAILURE *****'
+    sleep 2
+    puts "***** LAUNCH CODE #{code} INITIALIZED*****"
     sleep 2
     puts '***** NUCLEAR WEAPONS DEPLOYED *****'
     sleep 2
@@ -100,7 +103,7 @@ module Game
   end
 
   class Player
-    @@color_array = %w[P B R O G Y]
+    @@color_array = %w[P B R O G Y P B R O G Y P B R O G Y P B R O G Y]
 
     def self.access_color_array
       @@color_array
@@ -127,32 +130,23 @@ module Game
     end
 
     def win_check?(guess_count, feedback)
-      return true if guess_count.positive? && feedback == 'WWWW'
+      return true if guess_count.positive? && feedback == 'HHHH'
     end
 
     def loss_check?(guess_count, feedback)
-      return true if guess_count.zero? && feedback != 'WWWW'
+      return true if guess_count.zero? && feedback != 'HHHH'
     end
 
     def answer_comparison(human_guess, computer_code)
-      # w_array = []
-      # temp_array = []
-      # i = 0
-      # while i < 4
-      # if computer_code.include?(human_guess[i]) == false
-      # i += 1
-      # elsif human_guess[i] == computer_code[i]
-      # w_array.push('W')
-      # i += 1
-      # else
-      # temp_array.push(human_guess[i])
-      # i += 1
-      # end
-      # end
-      # b_number = temp_array.uniq.length
-      # b_array = Array.new(b_number, 'B')
-      # feedback_array = w_array.concat(b_array)
-      # @feedback_string = feedback_array.join('')
+      @feedback_string = String.new('')
+      computer_code.each_with_index do |code_char, index|
+        if human_guess[index] == code_char
+          @feedback_string << 'H'
+        elsif human_guess.include? code_char
+          @feedback_string << 'C'
+        end
+      end
+      @guesses_counter -= 1
     end
 
     def output(guess, feedback, guess_count)
@@ -164,7 +158,7 @@ module Game
     def initialize
       @computer_code = Player.access_color_array.sample(4)
       puts "\n *****>>>>> - INITIALIZING SKYNET CODE - <<<<<*****"
-      # sleep 3 - commented for speed - reinstate when ready for play
+      sleep 3
       puts "\nYOU HAVE 12 GUESSES REMAINING PUNY HUMAN. ENTER YOUR 4 COLORS IF YOU DARE."
       puts "\nP - Pink, B - Blue, R - Red, O - Orange, G - Green, Y - Yellow"
     end
