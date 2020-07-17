@@ -74,4 +74,20 @@ ___
 
 Found a bug lol. If the user had HHHH at 0 guesses remaining, the game continued into negative guesses remaining. Caught it! Also, now the user can choose their difficulty. V 1.1 complete. Moving on to the AI now. 
 
+___
+17th July 2020
+
+Step 3 - Refactor your code to allow the human player to choose whether he or she wants to be the creator of the code or the guesser - COMPLETE!
+- The user can now choose if they want to make or break the code, as well as set the difficulty level for themselves and the computer
+- Instructions/win/loss messages all adapted
+
+Step 4 - Build it so the computer will guess the colors the user inputs. Start by having the computer guess randomly, but keeping the ones that match exactly - IN PROGRESS
+- Computer successfully generating random guesses with win/loss logic being successfully applied (mostly, see TODO below)
+
+Make good steps forward today. Refactored a lot of the code so that most of the Player::Human specific methods are now in the player superclass. So are the guess counter, feedback string and color array (no more class variables yay!)
+
+TODO:
+- Fix the bug that causes a false-detection if the same letter is used twice by the computer (copy the Fensus code and refactor it to suit)
+- Make it so that if the computer gets an exact hit, it keeps that letter in all future guesses (will require detailed thought and planning)
+
 

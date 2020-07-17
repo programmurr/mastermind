@@ -1,19 +1,12 @@
 # frozen_string_literal: true
 
+require 'pry'
 module Game
-  def self.start_game
-    Game.welcome_message
-    if Game.skip_instructions? == false
-      Game.instructions
-      Game.player_ready?
-    end
-  end
-
-  def self.gameplay(human, computer)
+  def self.human_gameplay(human, computer)
     loop do
-      human.enter_user_answer
-      human.answer_comparison(human.user_guess, computer.computer_code)
-      human.output(human.user_guess, human.feedback_string, human.guesses_counter)
+      human.enter_user_input
+      human.answer_comparison(human.user_input, computer.computer_code)
+      human.output(human.user_input.join(''), human.feedback_string, human.guesses_counter)
       if human.win_check?(human.guesses_counter, human.feedback_string) == true
         Game.win_declaration
         break
@@ -24,20 +17,35 @@ module Game
     end
   end
 
+  def self.computer_gameplay(human, computer)
+    human.enter_user_input
+    loop do
+      sleep 3
+      computer.generate_new_code
+      computer.answer_comparison(computer.computer_code, human.user_input)
+      computer.output(computer.computer_code.join(''), computer.feedback_string, computer.guesses_counter)
+      if computer.win_check?(computer.guesses_counter, computer.feedback_string) == true
+        computer.loss_declaration(human.user_input.join(''))
+        break
+      elsif computer.loss_check?(computer.guesses_counter, computer.feedback_string) == true
+        computer.win_declaration
+        break
+      end
+    end
+  end
+
   def self.welcome_message
-    puts 'Hello! Welcome to'
-    puts '<<<<<***** MASTERMIND *****>>>>>'
-    puts "If you've played before, you can skip the instructions."
-    puts "Enter 'yes' if you would like to read them, or enter 'no' to skip them."
+    puts "\n<<<<<***** MASTERMIND *****>>>>>"
   end
 
   def self.skip_instructions?
+    puts "\nEnter 'Y' to read the instructions, or enter 'N' to skip."
     loop do
       preference = gets.chomp.to_s.downcase
-      return false if preference == 'yes'
-      return true if preference == 'no'
+      return false if preference == 'y'
+      return true if preference == 'n'
 
-      puts "Please enter either 'yes' or 'no' to read or skip the instructions"
+      puts "Please enter either 'Y' or 'N' to read or skip the instructions"
     end
   end
 
@@ -50,7 +58,7 @@ module Game
     end
   end
 
-  def self.instructions
+  def self.instructions_break
     puts "\nSKYNET is awake and getting ready to launch its nukes all up in our faces!"
     puts "For some reason, YOU are humanity's last hope and must try to input the abort code to stop the launch and save us all!"
     puts "\nSKYNET will choose up to 4 of 6 colors to make a code. It might use the same color more than once!"
@@ -74,7 +82,21 @@ module Game
     puts "Enter 'ready' when you're ready to play."
   end
 
+  def self.instructions_make
+    puts "\nSKYNET is trying to access our nuclear launch codes!"
+    puts "YOU have been determined as humanity's best code-maker to ever exist!"
+    puts "\nSo make a 4-letter long code from these 6 colors that SKYNET must try and guess!"
+    puts 'P - Pink, B - Blue, R - Red, O - Orange, G - Green, Y - Yellow'
+    puts "\nTo create your code, just enter the initials of the color, then press 'enter' when prompted, like this:"
+    puts 'PBYG'
+    puts "This means 'Purple, Blue, Yellow, Green'."
+    puts 'The input is not case sensitive, and you can use the same color more than once.'
+    puts "\nIf SKYNET guesses the code in time, humanity is doomed! So make it a good one! We're counting on you!"
+    puts "Enter 'ready' when you're ready to play."
+  end
+
   def self.win_declaration
+    sleep 2
     puts '***** ABORT CODE INPUT SUCCESS *****'
     sleep 2
     puts '***** NUCLEAR DEPLOYMENT CANCELLED *****'
@@ -88,9 +110,10 @@ module Game
   end
 
   def self.loss_declaration(code)
+    sleep 2
     puts '***** ABORT CODE INPUT FAILURE *****'
     sleep 2
-    puts "***** LAUNCH CODE #{code} INITIALIZED*****"
+    puts "***** LAUNCH CODE *#{code}* INITIALIZED*****"
     sleep 2
     puts '***** NUCLEAR WEAPONS DEPLOYED *****'
     sleep 2
@@ -101,31 +124,25 @@ module Game
     puts '* END GAME *'
   end
 
-  class Player
-    @@color_array = %w[P B R O G Y P B R O G Y P B R O G Y P B R O G Y]
+  def self.make?
+    puts "\nIf you would like to MAKE a code, enter 'M'"
+    puts "If you would like to BREAK a code, enter 'B'"
+    loop do
+      choose_make_or_break = gets.chomp.to_s.downcase
+      return false if choose_make_or_break == 'b'
+      return true if choose_make_or_break == 'm'
 
-    def self.access_color_array
-      @@color_array
+      puts "\nPlease enter 'M' to MAKE a code or 'B' to BREAK a code."
     end
   end
-  class Human < Player
-    include Game
-    attr_accessor :guesses_counter, :user_guess, :feedback_string
+
+  class Player
+    attr_accessor :guesses_counter, :feedback_string, :color_array, :user_input
+
     def initialize
+      @color_array = %w[P B R O G Y P B R O G Y P B R O G Y P B R O G Y]
       @guesses_counter = 12
       @feedback_string = String.new('')
-    end
-
-    def enter_user_answer
-      loop do
-        @user_guess = gets.chomp.to_s.upcase
-        if @user_guess.match(/[PBROGY]{4}/) && @user_guess.length == 4
-          return @user_guess.split('')
-        else
-          puts 'Please enter your 4 choices from the colors below:'
-          puts 'P - Pink, B - Blue, R - Red, O - Orange, G - Green, Y - Yellow'
-        end
-      end
     end
 
     def win_check?(guess_count, feedback)
@@ -136,12 +153,13 @@ module Game
       return true if guess_count.zero? && feedback != 'HHHH'
     end
 
-    def answer_comparison(human_guess, computer_code)
+    def answer_comparison(guess_code, answer_code)
+      binding.pry
       @feedback_string = String.new('')
-      computer_code.each_with_index do |code_char, index|
-        if human_guess[index] == code_char
+      answer_code.each_with_index do |code_char, index|
+        if guess_code[index] == code_char
           @feedback_string << 'H'
-        elsif human_guess.include? code_char
+        elsif guess_code.include? code_char
           @feedback_string << 'C'
         end
       end
@@ -152,7 +170,7 @@ module Game
       puts "#{guess} - #{feedback} - #{guess_count} guesses remaining!"
     end
 
-    def choose_difficulty
+    def choose_difficulty_break
       puts "\nPlease choose your difficulty level:"
       puts "\nEnter E for Easy - You have 12 guesses"
       puts 'Enter M for Medium - You have 9 guesses'
@@ -166,21 +184,117 @@ module Game
         puts 'Please enter the right letter to choose your difficulty level (it is not case-sensitive).'
       end
     end
-  end
-  class Computer < Player
-    attr_accessor :computer_code
-    def initialize(guesses)
-      @computer_code = Player.access_color_array.sample(4)
+
+    def choose_difficulty_make
+      puts "\nHow many guesses do you want the computer to have?"
+      puts "\nEnter E for Easy - Computer has 6 guesses"
+      puts 'Enter M for Medium - Computer has 9 guesses'
+      puts 'Enter H for Hard - Computer has 12 guesses'
+      loop do
+        difficulty = gets.chomp.to_s.downcase
+        return @guesses_counter = 6 if difficulty == 'e'
+        return @guesses_counter = 9 if difficulty == 'm'
+        return @guesses_counter = 12 if difficulty == 'h'
+
+        puts 'Please enter the right letter to choose your difficulty level (it is not case-sensitive).'
+      end
+    end
+
+    def skynet_intro_break
       puts "\n *****>>>>> - INITIALIZING SKYNET CODE - <<<<<*****"
       sleep 3
-      puts "\nYOU HAVE #{guesses} GUESSES REMAINING PUNY HUMAN. ENTER YOUR 4 COLORS IF YOU DARE."
+      puts "\nYOU HAVE #{guesses_counter} GUESSES REMAINING PUNY HUMAN. ENTER YOUR 4 COLORS IF YOU DARE."
       puts "\nP - Pink, B - Blue, R - Red, O - Orange, G - Green, Y - Yellow"
+    end
+
+    def skynet_intro_make
+      puts "\n *****>>>>> - INITIALIZING SKYNET - <<<<<*****"
+      sleep 3
+      puts "\n***** HUMOR DETECTED: HUMAN FALLACY OF THINKING IT CAN MAKE A CODE TOO STRONG FOR A MACHINE *****"
+      puts "\n***** I HAVE #{guesses_counter} GUESSES REMAINING HUMAN. MORE THAN I NEED *****"
+      puts "\n***** ENTER YOUR CODE CHOICE OF 4 COLORS BELOW *****"
+      puts 'P - Pink, B - Blue, R - Red, O - Orange, G - Green, Y - Yellow'
+    end
+
+    def enter_user_input
+      loop do
+        @user_input = gets.chomp.to_s.upcase
+        if @user_input.match(/[PBROGY]{4}/) && @user_input.length == 4
+          return @user_input = @user_input.split('')
+        else
+          puts 'Enter your 4 choices from the colors below:'
+          puts 'P - Pink, B - Blue, R - Red, O - Orange, G - Green, Y - Yellow'
+        end
+      end
+    end
+  end
+
+  class Human < Player
+    # include Game
+    def initialize
+      super
+    end
+  end
+
+  class Computer < Player
+    attr_accessor :computer_code
+    def initialize
+      super
+      @computer_code = @color_array.sample(4)
+    end
+
+    def generate_new_code
+      @computer_code = @color_array.sample(4)
+    end
+
+    def win_declaration
+      sleep 2
+      puts '***** CODE INPUT FAILURE *****'
+      sleep 2
+      puts '***** NUCLEAR DEPLOYMENT CANCELLED *****'
+      sleep 2
+      puts '***** SKYNET.EXE FILE SELF-DESTRUCT COMPLETE *****'
+      sleep 2
+      puts 'GAAAAAAHHHHHHH!!!!@@@###!~lauNCHINg!~!!*^&terMINATor*!%^!*('
+      sleep 3
+      puts 'Congratulations! Skynet failed to guess the code correctly and humanity is saved!'
+      puts '* END GAME *'
+    end
+
+    def loss_declaration(code)
+      sleep 2
+      puts '***** CODE INPUT SUCCESS *****'
+      sleep 2
+      puts "***** LAUNCH CODE *#{code}* INITIALIZED*****"
+      sleep 2
+      puts '***** NUCLEAR WEAPONS DEPLOYED *****'
+      sleep 2
+      puts '***** HUMANITY WILL BE ERASED *****'
+      sleep 2
+      puts '***** THANKS FOR ALL THE FISH *****'
+      sleep 3
+      puts '* END GAME *'
     end
   end
 end
 
-Game.start_game
+Game.welcome_message
 human_player = Game::Human.new
-human_player.choose_difficulty
-computer_player = Game::Computer.new(human_player.guesses_counter)
-Game.gameplay(human_player, computer_player)
+computer_player = Game::Computer.new
+if Game.make? == false
+  human_player.choose_difficulty_break
+  if Game.skip_instructions? == false
+    Game.instructions_break
+    Game.player_ready?
+  end
+  human_player.skynet_intro_break
+  Game.human_gameplay(human_player, computer_player)
+else
+  computer_player.choose_difficulty_make
+  if Game.skip_instructions? == false
+    Game.instructions_make
+    Game.player_ready?
+  end
+  computer_player.skynet_intro_make
+  Game.computer_gameplay(human_player, computer_player)
+end
