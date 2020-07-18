@@ -90,4 +90,11 @@ TODO:
 - Fix the bug that causes a false-detection if the same letter is used twice by the computer (copy the Fensus code and refactor it to suit)
 - Make it so that if the computer gets an exact hit, it keeps that letter in all future guesses (will require detailed thought and planning)
 
+___
+18th July 2020
+
+- Fixed false-detection bug, but cheated a little. I fixed it by stopping the color array repeating RBGOYP four times. If the computer could put two letters of the same kind in the code, the bug appeared, so I removed that possibility. Now it can only put in each color once (but I won't tell the user that)
+
+- Taking it easy today. Just did some pseudo-code for the random-detection remembrance. Will implement tomorrow and see if it works, then begin researching the 'AI' of sorts
+
 

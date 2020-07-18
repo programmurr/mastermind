@@ -97,9 +97,7 @@ module Game
 
   def self.win_declaration
     sleep 2
-    puts '***** ABORT CODE INPUT SUCCESS *****'
-    sleep 2
-    puts '***** NUCLEAR DEPLOYMENT CANCELLED *****'
+    puts '***** ABORT CODE INPUT SUCCESS / ***** NUCLEAR DEPLOYMENT CANCELLED *****'
     sleep 2
     puts '***** SKYNET.EXE FILE SELF-DESTRUCT COMPLETE *****'
     sleep 2
@@ -111,10 +109,8 @@ module Game
 
   def self.loss_declaration(code)
     sleep 2
-    puts '***** ABORT CODE INPUT FAILURE *****'
-    sleep 2
-    puts "***** LAUNCH CODE *#{code}* INITIALIZED*****"
-    sleep 2
+    puts "***** ABORT CODE INPUT FAILURE / LAUNCH CODE *#{code}* INITIALIZED*****"
+    sleep 3
     puts '***** NUCLEAR WEAPONS DEPLOYED *****'
     sleep 2
     puts '***** HUMANITY WILL BE ERASED *****'
@@ -140,7 +136,7 @@ module Game
     attr_accessor :guesses_counter, :feedback_string, :color_array, :user_input
 
     def initialize
-      @color_array = %w[P B R O G Y P B R O G Y P B R O G Y P B R O G Y]
+      @color_array = %w[P B R O G Y]
       @guesses_counter = 12
       @feedback_string = String.new('')
     end
@@ -154,14 +150,15 @@ module Game
     end
 
     def answer_comparison(guess_code, answer_code)
-      binding.pry
       @feedback_string = String.new('')
       answer_code.each_with_index do |code_char, index|
-        if guess_code[index] == code_char
-          @feedback_string << 'H'
-        elsif guess_code.include? code_char
-          @feedback_string << 'C'
-        end
+        @feedback_string << if guess_code[index] == code_char
+                              'H'
+                            elsif guess_code.include? code_char
+                              'C'
+                            else
+                              ''
+                            end
       end
       @guesses_counter -= 1
     end
@@ -171,8 +168,7 @@ module Game
     end
 
     def choose_difficulty_break
-      puts "\nPlease choose your difficulty level:"
-      puts "\nEnter E for Easy - You have 12 guesses"
+      puts "\nPlease choose your difficulty level:\nEnter E for Easy - You have 12 guesses"
       puts 'Enter M for Medium - You have 9 guesses'
       puts 'Enter H for Hard - You have 6 guesses'
       loop do
@@ -186,8 +182,7 @@ module Game
     end
 
     def choose_difficulty_make
-      puts "\nHow many guesses do you want the computer to have?"
-      puts "\nEnter E for Easy - Computer has 6 guesses"
+      puts "\nHow many guesses do you want the computer to have?\nEnter E for Easy - Computer has 6 guesses"
       puts 'Enter M for Medium - Computer has 9 guesses'
       puts 'Enter H for Hard - Computer has 12 guesses'
       loop do
@@ -230,7 +225,6 @@ module Game
   end
 
   class Human < Player
-    # include Game
     def initialize
       super
     end
@@ -249,9 +243,7 @@ module Game
 
     def win_declaration
       sleep 2
-      puts '***** CODE INPUT FAILURE *****'
-      sleep 2
-      puts '***** NUCLEAR DEPLOYMENT CANCELLED *****'
+      puts '***** CODE INPUT FAILURE \ NUCLEAR DEPLOYMENT CANCELLED *****'
       sleep 2
       puts '***** SKYNET.EXE FILE SELF-DESTRUCT COMPLETE *****'
       sleep 2
@@ -263,9 +255,7 @@ module Game
 
     def loss_declaration(code)
       sleep 2
-      puts '***** CODE INPUT SUCCESS *****'
-      sleep 2
-      puts "***** LAUNCH CODE *#{code}* INITIALIZED*****"
+      puts "***** CODE INPUT SUCCESS / LAUNCH CODE *#{code}* INITIALIZED*****"
       sleep 2
       puts '***** NUCLEAR WEAPONS DEPLOYED *****'
       sleep 2
