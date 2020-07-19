@@ -20,9 +20,9 @@ module Game
   def self.computer_gameplay(human, computer)
     human.enter_user_input
     loop do
-      sleep 3
+      sleep 2
       computer.generate_new_code
-      computer.answer_comparison(computer.computer_code, human.user_input)
+      computer.answer_comparison(computer.computer_code, human.user_input, computer)
       computer.output(computer.computer_code.join(''), computer.feedback_string, computer.guesses_counter)
       if computer.win_check?(computer.guesses_counter, computer.feedback_string) == true
         computer.loss_declaration(human.user_input.join(''))
@@ -35,10 +35,12 @@ module Game
   end
 
   def self.welcome_message
+    system 'clear'
     puts "\n<<<<<***** MASTERMIND *****>>>>>"
   end
 
   def self.skip_instructions?
+    system 'clear'
     puts "\nEnter 'Y' to read the instructions, or enter 'N' to skip."
     loop do
       preference = gets.chomp.to_s.downcase
@@ -59,6 +61,7 @@ module Game
   end
 
   def self.instructions_break
+    system 'clear'
     puts "\nSKYNET is awake and getting ready to launch its nukes all up in our faces!"
     puts "For some reason, YOU are humanity's last hope and must try to input the abort code to stop the launch and save us all!"
     puts "\nSKYNET will choose up to 4 of 6 colors to make a code. It might use the same color more than once!"
@@ -83,6 +86,7 @@ module Game
   end
 
   def self.instructions_make
+    system 'clear'
     puts "\nSKYNET is trying to access our nuclear launch codes!"
     puts "YOU have been determined as humanity's best code-maker to ever exist!"
     puts "\nSo make a 4-letter long code from these 6 colors that SKYNET must try and guess!"
@@ -168,6 +172,7 @@ module Game
     end
 
     def choose_difficulty_break
+      system 'clear'
       puts "\nPlease choose your difficulty level:\nEnter E for Easy - You have 12 guesses"
       puts 'Enter M for Medium - You have 9 guesses'
       puts 'Enter H for Hard - You have 6 guesses'
@@ -182,6 +187,7 @@ module Game
     end
 
     def choose_difficulty_make
+      system 'clear'
       puts "\nHow many guesses do you want the computer to have?\nEnter E for Easy - Computer has 6 guesses"
       puts 'Enter M for Medium - Computer has 9 guesses'
       puts 'Enter H for Hard - Computer has 12 guesses'
@@ -196,6 +202,7 @@ module Game
     end
 
     def skynet_intro_break
+      system 'clear'
       puts "\n *****>>>>> - INITIALIZING SKYNET CODE - <<<<<*****"
       sleep 3
       puts "\nYOU HAVE #{guesses_counter} GUESSES REMAINING PUNY HUMAN. ENTER YOUR 4 COLORS IF YOU DARE."
@@ -203,6 +210,7 @@ module Game
     end
 
     def skynet_intro_make
+      system 'clear'
       puts "\n *****>>>>> - INITIALIZING SKYNET - <<<<<*****"
       sleep 3
       puts "\n***** HUMOR DETECTED: HUMAN FALLACY OF THINKING IT CAN MAKE A CODE TOO STRONG FOR A MACHINE *****"
@@ -264,6 +272,20 @@ module Game
       puts '***** THANKS FOR ALL THE FISH *****'
       sleep 3
       puts '* END GAME *'
+    end
+
+    def answer_comparison(guess_code, answer_code, _computer)
+      @feedback_string = String.new('')
+      answer_code.each_with_index do |code_char, index|
+        @feedback_string << if guess_code[index] == code_char
+                              'H'
+                            elsif guess_code.include? code_char
+                              'C'
+                            else
+                              ''
+                            end
+      end
+      @guesses_counter -= 1
     end
   end
 end

@@ -97,4 +97,12 @@ ___
 
 - Taking it easy today. Just did some pseudo-code for the random-detection remembrance. Will implement tomorrow and see if it works, then begin researching the 'AI' of sorts
 
+___
+19th July 2020
+
+SOme more things to do!
+- Add colorizer, so when people type their color in it shows up as a color in the output
+- Will need to make a method that possibly uses a case statement to check the user answer array, convert the appropriate character into a color, then join and push as the color string
+- Create difficulty levels for computer - 'dumb' (random guesses) and 'smart' (will remember hits and close-calls)
+
 
