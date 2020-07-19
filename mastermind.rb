@@ -21,7 +21,7 @@ module Game
     human.enter_user_input
     loop do
       sleep 2
-      computer.generate_new_code
+      computer.generate_new_code(computer.detection_hash)
       computer.answer_comparison(computer.computer_code, human.user_input, computer)
       computer.output(computer.computer_code.join(''), computer.feedback_string, computer.guesses_counter)
       if computer.win_check?(computer.guesses_counter, computer.feedback_string) == true
@@ -101,11 +101,11 @@ module Game
 
   def self.win_declaration
     sleep 2
-    puts '***** ABORT CODE INPUT SUCCESS / ***** NUCLEAR DEPLOYMENT CANCELLED *****'
+    puts '***** ABORT CODE INPUT SUCCESS / NUCLEAR DEPLOYMENT CANCELLED *****'
     sleep 2
     puts '***** SKYNET.EXE FILE SELF-DESTRUCT COMPLETE *****'
     sleep 2
-    puts 'GAAAAAAHHHHHHH!!!!@@@###!~!~!!*^&*!%^!*('
+    puts 'GAAAAAAHHHHHHH!!!!@@@###!~L@uNcH!Ng!~!!*^&T3rM!n@T0r*!%^!*('
     sleep 3
     puts 'Congratulations! You correctly guessed the code and saved humanity in time!'
     puts '* END GAME *'
@@ -239,14 +239,29 @@ module Game
   end
 
   class Computer < Player
-    attr_accessor :computer_code
+    attr_accessor :computer_code, :detection_hash
     def initialize
       super
       @computer_code = @color_array.sample(4)
+      @detection_hash = { 'P' => nil, 'B' => nil, 'R' => nil, 'O' => nil, 'G' => nil, 'Y' => nil }
     end
 
-    def generate_new_code
-      @computer_code = @color_array.sample(4)
+    def generate_new_code(detection_hash)
+      @computer_code = Array.new(4)
+      compact_hash = detection_hash.compact
+      if compact_hash.empty?
+        @computer_code = @color_array.sample(4)
+      elsif compact_hash.empty? == false
+        compact_hash.each do |key, value|
+          @computer_code[value] = key
+        end
+      end
+      i = 0
+      while i < 4
+        @computer_code[i] = @color_array.sample(1).join('') if @computer_code[i].nil?
+        i += 1
+      end
+      @computer_code
     end
 
     def win_declaration
@@ -255,15 +270,15 @@ module Game
       sleep 2
       puts '***** SKYNET.EXE FILE SELF-DESTRUCT COMPLETE *****'
       sleep 2
-      puts 'GAAAAAAHHHHHHH!!!!@@@###!~lauNCHINg!~!!*^&terMINATor*!%^!*('
+      puts 'GAAAAAAHHHHHHH!!!!@@@###!~L@uNcH!Ng!~!!*^&T3rM!n@T0r*!%^!*('
       sleep 3
       puts 'Congratulations! Skynet failed to guess the code correctly and humanity is saved!'
       puts '* END GAME *'
     end
 
-    def loss_declaration(code)
+    def loss_declaration
       sleep 2
-      puts "***** CODE INPUT SUCCESS / LAUNCH CODE *#{code}* INITIALIZED*****"
+      puts '***** CODE INPUT SUCCESS / LAUNCH CODE INITIALIZED*****'
       sleep 2
       puts '***** NUCLEAR WEAPONS DEPLOYED *****'
       sleep 2
@@ -274,18 +289,23 @@ module Game
       puts '* END GAME *'
     end
 
-    def answer_comparison(guess_code, answer_code, _computer)
+    def answer_comparison(guess_code, answer_code, computer)
       @feedback_string = String.new('')
       answer_code.each_with_index do |code_char, index|
-        @feedback_string << if guess_code[index] == code_char
-                              'H'
-                            elsif guess_code.include? code_char
-                              'C'
-                            else
-                              ''
-                            end
+        if guess_code[index] == code_char
+          @feedback_string << 'H'
+          computer.remember_this_character(code_char, index)
+        elsif guess_code.include? code_char
+          @feedback_string << 'C'
+        else
+          @feedback_string << ''
+        end
       end
       @guesses_counter -= 1
+    end
+
+    def remember_this_character(character, index)
+      @detection_hash[character] = index
     end
   end
 end

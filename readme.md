@@ -100,9 +100,11 @@ ___
 ___
 19th July 2020
 
-SOme more things to do!
+Some more things to do!
 - Add colorizer, so when people type their color in it shows up as a color in the output
 - Will need to make a method that possibly uses a case statement to check the user answer array, convert the appropriate character into a color, then join and push as the color string
-- Create difficulty levels for computer - 'dumb' (random guesses) and 'smart' (will remember hits and close-calls)
+- Create difficulty levels for computer - 'dumb' (random guesses) and 'smart' (will remember hits and close-calls), and remove amount of guesses so it's cleaner to use
+
+When these are done, v2.0 will be complete
 
 
