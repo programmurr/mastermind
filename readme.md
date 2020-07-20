@@ -119,5 +119,16 @@ It'll usually guess the code input by the user in time, depending on the difficu
 
 Will have a go at outputting color now
 
+___
+20th July 2020
+
+IT'S FINISHED WOOOOO!
+- Colorizing is complete. One small improvement is to display the player's color code after input for the 'make' section, but this caused huge issues later so wasnt worth the effort of fixing
+- Make section fully functional
+- Break section fully functional
+- AI is smarted, remembering Hs and Cs appropriately
+- Possible improvement for future is to make the computer follow the knuth algorithm, and set the difficulty of the computer instead of just number of guesses it has
+- Screen also clears in between titles and instructions because of 'system 'clear'' - resulting in cleaner UI
+ 
 
 

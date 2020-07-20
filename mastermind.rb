@@ -1,16 +1,20 @@
 # frozen_string_literal: true
 
+require 'colorize'
+
 module Game
   def self.human_gameplay(human, computer)
     loop do
       human.enter_user_input
       human.answer_comparison(human.user_input, computer.computer_code)
-      human.output(human.user_input.join(''), human.feedback_string, human.guesses_counter)
+      human.colorize_guess(human.user_input)
+      human.output(human.colorized_output, human.feedback_string, human.guesses_counter)
       if human.win_check?(human.guesses_counter, human.feedback_string) == true
         Game.win_declaration
         break
       elsif human.loss_check?(human.guesses_counter, human.feedback_string) == true
-        Game.loss_declaration(computer.computer_code.join(''))
+        computer.colorize_guess(computer.computer_code)
+        Game.loss_declaration(computer.colorized_output)
         break
       end
     end
@@ -23,7 +27,8 @@ module Game
       computer.generate_new_code(computer.hit_array, computer.close_array)
       computer.reset_close_array
       computer.answer_comparison(computer.computer_code, human.user_input, computer)
-      computer.output(computer.computer_code.join(''), computer.feedback_string, computer.guesses_counter)
+      computer.colorize_guess(computer.computer_code)
+      computer.output(computer.colorized_output, computer.feedback_string, computer.guesses_counter)
       if computer.win_check?(computer.guesses_counter, computer.feedback_string) == true
         computer.loss_declaration
         break
@@ -65,20 +70,20 @@ module Game
     puts "\nSKYNET is awake and getting ready to launch its nukes all up in our faces!"
     puts "For some reason, YOU are humanity's last hope and must try to input the abort code to stop the launch and save us all!"
     puts "\nSKYNET will choose up to 4 of 6 colors to make a code. It might use the same color more than once!"
-    puts 'The colors it can choose from are: P - Pink, B - Blue, R - Red, O - Orange, G - Green, Y - Yellow.'
+    puts "The colors it can choose from are: #{'M - Magenta'.magenta}, #{'B - Blue'.blue}, #{'R - Red'.red}, #{'P - Pink'.light_red}, #{'G - Green'.green}, #{'Y - Yellow'.yellow}."
     puts "You need to guess which color SKYNET chooses and the order it puts them in it's code."
-    puts "\nEnter your guess by entering the initials of the colors. To guess 'Yellow, Blue, Orange, Green', type:"
-    puts "'YBOG' then press enter (the input is not case-sensitive)."
+    puts "\nEnter your guess by entering the initials of the colors. To guess '#{'Yellow'.yellow}, #{'Blue'.blue}, #{'Pink'.light_red}, #{'Green'.green}', type:"
+    puts 'YBPG then press enter (the input is not case-sensitive).'
     puts 'Easy! You will also receive feedback after every guess.'
     puts "'H' means 'HIT!' - meaning that you have guessed one correct color that is in the correct place."
     puts "'C' means 'CLOSE!' - meaning you have guessed one correct color but it's in the wrong place."
     puts 'No feedback is given if one or all of your guesses are wrong.'
     puts "\nSo after you enter your guess, you will see this:"
-    puts 'YBOG - HC - 11 guesses left!'
-    puts "'YBOG' is your guess. 'HC' is the feedback. '11 guesses left' is...well, it's how many guesses are left!"
+    puts "#{'  '.on_yellow}-#{'  '.on_blue}-#{'  '.on_light_red}-#{'  '.on_green} - HC - 11 guesses left!"
+    puts "'YBPG' is your guess. 'HC' is the feedback. '11 guesses left' is...well, it's how many guesses are left!"
     puts 'We guessed one color in the right place, one color in the wrong place, and our two other guesses were completely wrong.'
     puts "\nTo win, your feedback will need to say 'HHHH' before you run out of guesses, like below:"
-    puts 'GROP - HHHH - 6 guesses left!'
+    puts "#{'  '.on_green}-#{'  '.on_red}-#{'  '.on_light_red}-#{'  '.on_magenta} - HHHH - 6 guesses left!"
     puts "This means we have guessed 4 colors all in exactly the right positions and we've won! Yay! We saved humanity!"
     puts "If you run out of guesses without success, the game is over and we're all burning in nuclear hell-fire."
     puts "\nGood luck! Remember all humanity depends on this. No biggie."
@@ -90,10 +95,10 @@ module Game
     puts "\nSKYNET is trying to access our nuclear launch codes!"
     puts "YOU have been determined as humanity's best code-maker to ever exist!"
     puts "\nSo make a 4-letter long code from these 6 colors that SKYNET must try and guess!"
-    puts 'P - Pink, B - Blue, R - Red, O - Orange, G - Green, Y - Yellow'
+    puts "#{'M - Magenta'.magenta}, #{'B - Blue'.blue}, #{'R - Red'.red}, #{'P - Pink'.light_red}, #{'G - Green'.green}, #{'Y - Yellow'.yellow}"
     puts "\nTo create your code, just enter the initials of the color, then press 'enter' when prompted, like this:"
-    puts 'PBYG'
-    puts "This means 'Purple, Blue, Yellow, Green'."
+    puts 'MBYG'
+    puts "This means #{'Magenta'.magenta}, #{'Blue'.blue}, #{'Yellow'.yellow}, #{'Green'.green}."
     puts 'The input is not case sensitive, and you can use the same color more than once.'
     puts "\nIf SKYNET guesses the code in time, humanity is doomed! So make it a good one! We're counting on you!"
     puts "Enter 'ready' when you're ready to play."
@@ -113,7 +118,7 @@ module Game
 
   def self.loss_declaration(code)
     sleep 2
-    puts "\n***** ABORT CODE INPUT FAILURE / LAUNCH CODE *#{code}* INITIALIZED*****"
+    puts "\n***** ABORT CODE INPUT FAILURE / LAUNCH CODE #{code} INITIALIZED*****"
     sleep 3
     puts '***** NUCLEAR WEAPONS DEPLOYED *****'
     sleep 2
@@ -137,10 +142,10 @@ module Game
   end
 
   class Player
-    attr_accessor :guesses_counter, :feedback_string, :color_array, :user_input
+    attr_accessor :guesses_counter, :feedback_string, :color_array, :user_input, :colorized_output
 
     def initialize
-      @color_array = %w[P B R O G Y]
+      @color_array = %w[M B R P G Y]
       @guesses_counter = 12
       @feedback_string = String.new('')
     end
@@ -206,7 +211,7 @@ module Game
       puts "\n *****>>>>> - INITIALIZING SKYNET CODE - <<<<<*****"
       sleep 3
       puts "\nYOU HAVE #{guesses_counter} GUESSES REMAINING PUNY HUMAN. ENTER YOUR 4 COLORS IF YOU DARE."
-      puts "\nP - Pink, B - Blue, R - Red, O - Orange, G - Green, Y - Yellow"
+      puts "\nM - Magenta, B - Blue, R - Red, P - Pink, G - Green, Y - Yellow"
     end
 
     def skynet_intro_make
@@ -216,19 +221,39 @@ module Game
       puts "\n***** HUMOR DETECTED: HUMAN FALLACY OF THINKING IT CAN MAKE A CODE TOO STRONG FOR A MACHINE *****"
       puts "\n***** I HAVE #{guesses_counter} GUESSES REMAINING HUMAN. MORE THAN I NEED *****"
       puts "\n***** ENTER YOUR CODE CHOICE OF 4 COLORS BELOW *****"
-      puts 'P - Pink, B - Blue, R - Red, O - Orange, G - Green, Y - Yellow'
+      puts 'M - Magenta, B - Blue, R - Red, P - Pink, G - Green, Y - Yellow'
     end
 
     def enter_user_input
       loop do
         @user_input = gets.chomp.to_s.upcase
-        if @user_input.match(/[PBROGY]{4}/) && @user_input.length == 4
+        if @user_input.match(/[MBRPGY]{4}/) && @user_input.length == 4
           return @user_input = @user_input.split('')
         else
           puts 'Enter your 4 choices from the colors below:'
-          puts 'P - Pink, B - Blue, R - Red, O - Orange, G - Green, Y - Yellow'
+          puts 'M - Magenta, B - Blue, R - Red, P - Pink, G - Green, Y - Yellow'
         end
       end
+    end
+
+    def colorize_guess(guess)
+      guess.map! do |element|
+        case element
+        when 'M'
+          element = '  '.on_magenta
+        when 'B'
+          element = '  '.on_blue
+        when 'R'
+          element = '  '.on_red
+        when 'P'
+          element = '  '.on_light_red
+        when 'G'
+          element = '  '.on_green
+        when 'Y'
+          element = '  '.on_yellow
+        end
+      end
+      @colorized_output = guess.join('-')
     end
   end
 
