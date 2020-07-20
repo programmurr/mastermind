@@ -20,8 +20,8 @@ module Game
     human.enter_user_input
     loop do
       sleep 2
-      computer.generate_new_code(computer.hit_hash, computer.close_hash)
-      computer.reset_close_hash
+      computer.generate_new_code(computer.hit_array, computer.close_array)
+      computer.reset_close_array
       computer.answer_comparison(computer.computer_code, human.user_input, computer)
       computer.output(computer.computer_code.join(''), computer.feedback_string, computer.guesses_counter)
       if computer.win_check?(computer.guesses_counter, computer.feedback_string) == true
@@ -101,7 +101,7 @@ module Game
 
   def self.win_declaration
     sleep 2
-    puts '***** ABORT CODE INPUT SUCCESS / NUCLEAR DEPLOYMENT CANCELLED *****'
+    puts "\n***** ABORT CODE INPUT SUCCESS / NUCLEAR DEPLOYMENT CANCELLED *****"
     sleep 2
     puts '***** SKYNET.EXE FILE SELF-DESTRUCT COMPLETE *****'
     sleep 2
@@ -113,7 +113,7 @@ module Game
 
   def self.loss_declaration(code)
     sleep 2
-    puts "***** ABORT CODE INPUT FAILURE / LAUNCH CODE *#{code}* INITIALIZED*****"
+    puts "\n***** ABORT CODE INPUT FAILURE / LAUNCH CODE *#{code}* INITIALIZED*****"
     sleep 3
     puts '***** NUCLEAR WEAPONS DEPLOYED *****'
     sleep 2
@@ -168,7 +168,7 @@ module Game
     end
 
     def output(guess, feedback, guess_count)
-      puts "#{guess} - #{feedback} - #{guess_count} guesses remaining!"
+      puts "\n#{guess} - #{feedback} - #{guess_count} guesses remaining!"
     end
 
     def choose_difficulty_break
@@ -239,39 +239,31 @@ module Game
   end
 
   class Computer < Player
-    attr_accessor :computer_code, :hit_hash, :close_hash
+    attr_accessor :computer_code, :hit_array, :close_array
     def initialize
       super
       @computer_code = @color_array.sample(4)
-      @hit_hash = { 'P' => nil, 'B' => nil, 'R' => nil, 'O' => nil, 'G' => nil, 'Y' => nil }
-      @close_hash = { 'P' => nil, 'B' => nil, 'R' => nil, 'O' => nil, 'G' => nil, 'Y' => nil }
+      @hit_array = Array.new(4)
+      @close_array = Array.new(4)
     end
 
-    def generate_new_code(hit_hash, close_hash)
+    def generate_new_code(hit_ary, close_ary)
       @computer_code = Array.new(4)
-      compact_hit_hash = hit_hash.compact
-      compact_close_hash = close_hash.compact
-      if compact_hit_hash.empty? && compact_close_hash.empty?
-        @computer_code = @color_array.sample(4)
-      elsif compact_hit_hash.empty? == false && compact_close_hash.empty?
-        compact_hit_hash.each do |key, value|
-          @computer_code[value] = key
+      @computer_code.each.with_index do |_color, index|
+        @computer_code[index] = hit_ary[index] unless hit_ary[index].nil?
+      end
+      i = 0
+      while i < 4
+        random_index = rand(4)
+        if close_ary[i] == nil?
+          next
+        elsif !close_ary[i].nil? && !@computer_code[random_index].nil?
+          redo
+        elsif !close_ary[i].nil? && @computer_code[random_index].nil?
+          @computer_code[random_index] = close_ary[i]
         end
-      elsif compact_hit_hash.empty? && compact_close_hash.empty? == false
-        compact_close_hash.each do |key, _value|
-          @computer_code.each.with_index do |_element, index|
-            @computer_code[index] = key if @computer_code[index].nil?
-          end
-        end
-      elsif compact_hit_hash.empty? == false && compact_close_hash.empty? == false
-        compact_hit_hash.each do |key, value|
-          @computer_code[value] = key
-        end
-        compact_close_hash.each do |key, _value|
-          @computer_code.each.with_index do |element, index|
-            @computer_code[index] = key if element.nil?
-          end
-        end
+
+        i += 1
       end
       @computer_code.each.with_index do |_element, index|
         @computer_code[index] = @color_array.sample(1).join('') if @computer_code[index].nil?
@@ -281,7 +273,7 @@ module Game
 
     def win_declaration
       sleep 2
-      puts '***** CODE INPUT FAILURE \ NUCLEAR DEPLOYMENT CANCELLED *****'
+      puts "\n***** CODE INPUT FAILURE / NUCLEAR DEPLOYMENT CANCELLED *****"
       sleep 2
       puts '***** SKYNET.EXE FILE SELF-DESTRUCT COMPLETE *****'
       sleep 2
@@ -293,7 +285,7 @@ module Game
 
     def loss_declaration
       sleep 2
-      puts '***** CODE INPUT SUCCESS / LAUNCH CODE INITIALIZED*****'
+      puts "\n***** CODE INPUT SUCCESS / LAUNCH CODE INITIALIZED*****"
       sleep 2
       puts '***** NUCLEAR WEAPONS DEPLOYED *****'
       sleep 2
@@ -321,15 +313,15 @@ module Game
     end
 
     def remember_this_close_character(character, index)
-      @close_hash[character] = index
+      @close_array[index] = character
     end
 
     def remember_this_hit_character(character, index)
-      @hit_hash[character] = index
+      @hit_array[index] = character
     end
 
-    def reset_close_hash
-      @close_hash = { 'P' => nil, 'B' => nil, 'R' => nil, 'O' => nil, 'G' => nil, 'Y' => nil }
+    def reset_close_array
+      @close_array = Array.new(4)
     end
   end
 end
