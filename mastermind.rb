@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'pry'
 module Game
   def self.human_gameplay(human, computer)
     loop do
@@ -21,11 +20,12 @@ module Game
     human.enter_user_input
     loop do
       sleep 2
-      computer.generate_new_code(computer.detection_hash)
+      computer.generate_new_code(computer.hit_hash, computer.close_hash)
+      computer.reset_close_hash
       computer.answer_comparison(computer.computer_code, human.user_input, computer)
       computer.output(computer.computer_code.join(''), computer.feedback_string, computer.guesses_counter)
       if computer.win_check?(computer.guesses_counter, computer.feedback_string) == true
-        computer.loss_declaration(human.user_input.join(''))
+        computer.loss_declaration
         break
       elsif computer.loss_check?(computer.guesses_counter, computer.feedback_string) == true
         computer.win_declaration
@@ -239,27 +239,42 @@ module Game
   end
 
   class Computer < Player
-    attr_accessor :computer_code, :detection_hash
+    attr_accessor :computer_code, :hit_hash, :close_hash
     def initialize
       super
       @computer_code = @color_array.sample(4)
-      @detection_hash = { 'P' => nil, 'B' => nil, 'R' => nil, 'O' => nil, 'G' => nil, 'Y' => nil }
+      @hit_hash = { 'P' => nil, 'B' => nil, 'R' => nil, 'O' => nil, 'G' => nil, 'Y' => nil }
+      @close_hash = { 'P' => nil, 'B' => nil, 'R' => nil, 'O' => nil, 'G' => nil, 'Y' => nil }
     end
 
-    def generate_new_code(detection_hash)
+    def generate_new_code(hit_hash, close_hash)
       @computer_code = Array.new(4)
-      compact_hash = detection_hash.compact
-      if compact_hash.empty?
+      compact_hit_hash = hit_hash.compact
+      compact_close_hash = close_hash.compact
+      if compact_hit_hash.empty? && compact_close_hash.empty?
         @computer_code = @color_array.sample(4)
-      elsif compact_hash.empty? == false
-        compact_hash.each do |key, value|
+      elsif compact_hit_hash.empty? == false && compact_close_hash.empty?
+        compact_hit_hash.each do |key, value|
           @computer_code[value] = key
         end
+      elsif compact_hit_hash.empty? && compact_close_hash.empty? == false
+        compact_close_hash.each do |key, _value|
+          @computer_code.each.with_index do |_element, index|
+            @computer_code[index] = key if @computer_code[index].nil?
+          end
+        end
+      elsif compact_hit_hash.empty? == false && compact_close_hash.empty? == false
+        compact_hit_hash.each do |key, value|
+          @computer_code[value] = key
+        end
+        compact_close_hash.each do |key, _value|
+          @computer_code.each.with_index do |element, index|
+            @computer_code[index] = key if element.nil?
+          end
+        end
       end
-      i = 0
-      while i < 4
-        @computer_code[i] = @color_array.sample(1).join('') if @computer_code[i].nil?
-        i += 1
+      @computer_code.each.with_index do |_element, index|
+        @computer_code[index] = @color_array.sample(1).join('') if @computer_code[index].nil?
       end
       @computer_code
     end
@@ -294,9 +309,10 @@ module Game
       answer_code.each_with_index do |code_char, index|
         if guess_code[index] == code_char
           @feedback_string << 'H'
-          computer.remember_this_character(code_char, index)
+          computer.remember_this_hit_character(code_char, index)
         elsif guess_code.include? code_char
           @feedback_string << 'C'
+          computer.remember_this_close_character(code_char, index)
         else
           @feedback_string << ''
         end
@@ -304,8 +320,16 @@ module Game
       @guesses_counter -= 1
     end
 
-    def remember_this_character(character, index)
-      @detection_hash[character] = index
+    def remember_this_close_character(character, index)
+      @close_hash[character] = index
+    end
+
+    def remember_this_hit_character(character, index)
+      @hit_hash[character] = index
+    end
+
+    def reset_close_hash
+      @close_hash = { 'P' => nil, 'B' => nil, 'R' => nil, 'O' => nil, 'G' => nil, 'Y' => nil }
     end
   end
 end

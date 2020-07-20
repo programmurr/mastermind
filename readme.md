@@ -107,4 +107,17 @@ Some more things to do!
 
 When these are done, v2.0 will be complete
 
+___
+19th July 2020
+
+It's kind of working.
+
+It'll usually guess the code input by the user in time, depending on the difficulty level, but there's 3 issues:
+- One is at line 263. If a color from the compact_close_hash has already been put in there, it might overwrite it. Need to rewrite this so it doesn't happen.
+- In general it's sometimes 'forgetting' a color it should be remembering e.g. if the code is PYRO and it guesses BOYR, in the next guess it might guess BGYR - dropping a color. I think it could be because of the first problem before this. Will try and fix it tomorrow
+- The generate_color_code hash is monstrous. I may just delete it and start anew, see if that helps with the problem above if I can't find another way to get it working. Could make a hit_array e.g. [nil, nil, Y, O] and a close_array [R, nil, nil, nil], then try to randomly put the R into the @color_code at a random nil value. Could be simpler than using hashes with the above
+
+Will have a go at outputting color now
+
+
 
