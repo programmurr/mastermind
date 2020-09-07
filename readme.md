@@ -1,134 +1,15 @@
-13th July 2020
+# Mastermind
 
-Initialization of github repository. Just pseudocode and planning today.
-___
-13th July 2020
+*"A game where you have to guess your opponent’s secret code within a certain number of turns. Each turn you get some feedback about how good your guess was – whether it was exactly correct or just the correct color but in the wrong space"*
 
-Welp, looks like I jumped ahead a bit. Anyway, here's what's accomplished so far:
+## Assignment:
 
-COMPLETED:
-- Introduction is functional
-- Skip instruction/play instruction option is functional
-- Computer and human player objects are being generated
-- Computer and human player objects are being successfully passed in to gameplay
-- The computer player is successfully generating a random array of 4 colors
-- Successfully obtaining and verifying user input for answer.
-- The player must enter exactly 4 of PBROGY or the answer will not be accepted and it will tell them to try again
-- That guess is being stored as a variable
+1. Build a Mastermind game from the command line where you have 12 turns to guess the secret code, starting with you guessing the computer’s random code
 
-Comment - so far generally successful in keeping most of the code inside the module. Let's keep this up!
+2. Now refactor your code to allow the human player to choose whether he/she wants to be the creator of the secret code or the guesser
 
-TODO:
-- General gameplay loop
-- Create answer comparison method (and sub-methods when necessary)
-- Create output method for UI
-- Create win/loss checks and logic
+3. Build it out so that the computer will guess if you decide to choose your own secret colors. You may choose to implement a computer strategy that follows the rules of the game or you can modify these rules
 
-___
-14th July 2020
-COMPLETED:
-- Introduction is functional
-- Skip instruction/play instruction option is functional
-- Computer and human player objects are being generated
-- Computer and human player objects are being successfully passed in to gameplay
-- The computer player is successfully generating a random array of 4 colors
-- Successfully obtaining and verifying user input for answer.
-- The player must enter exactly 4 of PBROGY or the answer will not be accepted and it will tell them to try again
-- That guess is being stored as a variable
-- General gameplay loop
-- Create output method for UI
-- Create win/loss checks and logic
+### Current status:
 
-TODO:
-- Create answer comparison method (and sub-methods when necessary)
-- Save as a 'version' (refer to git instructions book) when this is complete.
-
-So the game is pretty much complete, except for the fact that the most crucial part is not working and I haven't figured it out yet. Which I will.
-The UI is all complete, the game loop is tested, the win/loss checks and logic work.
-
-After banging my head against the answer comparison logic for a few hours, I chucked everything and can see promise in using hashes. I tried arrays and regexp, doesn't seem like they can handle it. So I've got it pseudocoded in a test code file for now and can see promise in it. See if I can find some way of whittling down the detections to produce the appropriate Ws and Bs. Check the exercises folder to see if there are any useful hash methods or solutions in there.
-
-___
-15th July 2020
-
-Still haven't been able to solve it today. After about 6 hours. I WILL SOLVE IT, just need to clear my head after today. Maybe get back to writing it down. Just get off the computer for now.
-Deep in the hash rabbit hole lol. I've made progress, but keep getting stuck on the same point 'only push 1 B if the color is detected more than once but the indexes don't match'
-Maybe try a whole new approach next time. Even the hashes might not be enough.
-
-___
-16th July 2020
-
-Version one is complete! W00t!
-
-I can't take credit though. I reached out to the kind people at the odin project discord and they helped a LOT!
-
-The lesson learned is:
-- If it looks needlessly complicated, it probably is
-
-I'm just glad that I didn't give in and look at any solutions this time, just kept trying different ways, and wasn't *totally* afraid to delete code and start over. However, I talked myself into a hash method and didn't talk myself out of it, when a simple array comparison was indeed all that was needed. I was initially right! Just didn't know how to do what I wanted. But now, I do!
-
-On to version 2... building the AI.
-
-___
-16th July additional - 
-
-Found a bug lol. If the user had HHHH at 0 guesses remaining, the game continued into negative guesses remaining. Caught it! Also, now the user can choose their difficulty. V 1.1 complete. Moving on to the AI now. 
-
-___
-17th July 2020
-
-Step 3 - Refactor your code to allow the human player to choose whether he or she wants to be the creator of the code or the guesser - COMPLETE!
-- The user can now choose if they want to make or break the code, as well as set the difficulty level for themselves and the computer
-- Instructions/win/loss messages all adapted
-
-Step 4 - Build it so the computer will guess the colors the user inputs. Start by having the computer guess randomly, but keeping the ones that match exactly - IN PROGRESS
-- Computer successfully generating random guesses with win/loss logic being successfully applied (mostly, see TODO below)
-
-Make good steps forward today. Refactored a lot of the code so that most of the Player::Human specific methods are now in the player superclass. So are the guess counter, feedback string and color array (no more class variables yay!)
-
-TODO:
-- Fix the bug that causes a false-detection if the same letter is used twice by the computer (copy the Fensus code and refactor it to suit)
-- Make it so that if the computer gets an exact hit, it keeps that letter in all future guesses (will require detailed thought and planning)
-
-___
-18th July 2020
-
-- Fixed false-detection bug, but cheated a little. I fixed it by stopping the color array repeating RBGOYP four times. If the computer could put two letters of the same kind in the code, the bug appeared, so I removed that possibility. Now it can only put in each color once (but I won't tell the user that)
-
-- Taking it easy today. Just did some pseudo-code for the random-detection remembrance. Will implement tomorrow and see if it works, then begin researching the 'AI' of sorts
-
-___
-19th July 2020
-
-Some more things to do!
-- Add colorizer, so when people type their color in it shows up as a color in the output
-- Will need to make a method that possibly uses a case statement to check the user answer array, convert the appropriate character into a color, then join and push as the color string
-- Create difficulty levels for computer - 'dumb' (random guesses) and 'smart' (will remember hits and close-calls), and remove amount of guesses so it's cleaner to use
-
-When these are done, v2.0 will be complete
-
-___
-19th July 2020
-
-It's kind of working.
-
-It'll usually guess the code input by the user in time, depending on the difficulty level, but there's 3 issues:
-- One is at line 263. If a color from the compact_close_hash has already been put in there, it might overwrite it. Need to rewrite this so it doesn't happen.
-- In general it's sometimes 'forgetting' a color it should be remembering e.g. if the code is PYRO and it guesses BOYR, in the next guess it might guess BGYR - dropping a color. I think it could be because of the first problem before this. Will try and fix it tomorrow
-- The generate_color_code hash is monstrous. I may just delete it and start anew, see if that helps with the problem above if I can't find another way to get it working. Could make a hit_array e.g. [nil, nil, Y, O] and a close_array [R, nil, nil, nil], then try to randomly put the R into the @color_code at a random nil value. Could be simpler than using hashes with the above
-
-Will have a go at outputting color now
-
-___
-20th July 2020
-
-IT'S FINISHED WOOOOO!
-- Colorizing is complete. One small improvement is to display the player's color code after input for the 'make' section, but this caused huge issues later so wasnt worth the effort of fixing
-- Make section fully functional
-- Break section fully functional
-- AI is smarted, remembering Hs and Cs appropriately
-- Possible improvement for future is to make the computer follow the knuth algorithm, and set the difficulty of the computer instead of just number of guesses it has
-- Screen also clears in between titles and instructions because of 'system 'clear'' - resulting in cleaner UI
- 
-
-
+Complete! View it live on replit: https://repl.it/@programmurr/MastermindV2withcolor#main.rb
